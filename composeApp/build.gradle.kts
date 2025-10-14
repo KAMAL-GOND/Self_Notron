@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    //kotlin("jvm") version "+" // or kotlin("multiplatform") or any other kotlin plugin
+    kotlin("plugin.serialization") version "+"
 }
 
 kotlin {
@@ -56,7 +58,18 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-        }
+            //implementation(platform("io.github.jan-tennert.supabase:bom:+"))
+            implementation("io.github.jan-tennert.supabase:postgrest-kt:+")
+            implementation("io.github.jan-tennert.supabase:auth-kt:+")
+            implementation("io.github.jan-tennert.supabase:realtime-kt:+")
+            implementation("io.ktor:ktor-client-cio:+")
+            implementation("io.ktor:ktor-client-core:+")
+            implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:+")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+
+    }
+
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
