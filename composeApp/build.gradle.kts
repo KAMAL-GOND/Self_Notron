@@ -19,8 +19,7 @@ kotlin {
         }
     }
 
-    // This is the JVM target for your desktop application
-    //jvm()
+
     jvm("desktop")
 
     listOf(
@@ -48,6 +47,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation("io.insert-koin:koin-android:4.0.0")
+            implementation("io.insert-koin:koin-androidx-compose:4.0.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -66,18 +67,30 @@ kotlin {
             implementation("io.ktor:ktor-client-core:+")
             implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:+")
             implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:+")
+            implementation("io.insert-koin:koin-core:4.0.0")
+
+            // ✅ Compose Multiplatform integration (for koinInject)
+            implementation("io.insert-koin:koin-compose:4.0.0")
 
     }
+        iosMain.dependencies {
+            implementation("io.insert-koin:koin-core:4.0.0")
+        }
 
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         // Dependencies for the desktop JVM target
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutinesSwing)
+                implementation("io.insert-koin:koin-core:4.0.0")
+            }
         }
+
     }
 }
 
