@@ -32,8 +32,7 @@ import self_notron.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     val supabase = createSupabaseClient(
-        supabaseUrl =
-        supabaseKey =
+
     ) {
       //  install(Auth)
         install(Postgrest)
