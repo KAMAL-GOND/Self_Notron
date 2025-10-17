@@ -69,6 +69,9 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:+")
             implementation("io.insert-koin:koin-core:4.0.0")
+            //implementation("io.github.dev-mobile-actions:compose-icons-feather:+")
+           // implementation("io.github.kevinnzou:compose-icons-feather:1.3.0")
+
 
             // ✅ Compose Multiplatform integration (for koinInject)
             implementation("io.insert-koin:koin-compose:4.0.0")

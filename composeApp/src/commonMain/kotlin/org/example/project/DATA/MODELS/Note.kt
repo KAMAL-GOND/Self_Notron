@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Note (
-    val id: Long?= null,
-    val Task: String? = null,
-    val Checked: Boolean = false,
-    val Priority: Int?=null,
+    var id: Long?= null,
+    var Task: String? = null,
+    var Checked: Boolean = false,
+    var Priority: Int?=null,
     //val created_at: String,
 
 )

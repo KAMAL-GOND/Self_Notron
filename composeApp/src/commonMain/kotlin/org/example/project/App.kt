@@ -31,14 +31,7 @@ import self_notron.composeapp.generated.resources.compose_multiplatform
 @Composable
 @Preview
 fun App() {
-    val supabase = createSupabaseClient(
 
-    ) {
-      //  install(Auth)
-        install(Postgrest)
-        //defaultSerializer = KotlinxSerializer()
-        //install other modules
-    }
     var corutine = rememberCoroutineScope()
 
     MaterialTheme {
