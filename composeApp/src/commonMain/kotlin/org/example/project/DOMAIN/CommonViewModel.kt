@@ -3,11 +3,14 @@ package org.example.project.DOMAIN
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.example.project.DATA.DI.Supabase
 import org.example.project.DATA.MODELS.Note
+import org.example.project.SCREEN.Widgets.Logd
 
 class CommonViewModel : ViewModel() {
     private val _AddStateFlow = MutableStateFlow(State())
@@ -20,7 +23,7 @@ class CommonViewModel : ViewModel() {
         _AddStateFlow.value = State(isLoading = true)
         try{
             val response = Client.from("Self_Notron").insert(note)
-            _AddStateFlow.value = State(Sucess = response)
+           // _AddStateFlow.value = State(Sucess = response)
             GetNotes()
 
 
@@ -41,7 +44,7 @@ class CommonViewModel : ViewModel() {
                      filter {
                     eq("id", id)}
                 }
-                _DeleteFlow.value = State(Sucess = "Deleted")
+                //_DeleteFlow.value = State(Sucess = "Deleted")
                 GetNotes()
 
 
@@ -62,7 +65,7 @@ class CommonViewModel : ViewModel() {
                     filter {
                     eq("id", note.id.toString())}
                 }
-                _UpdateFlow.value = State(Sucess = response)
+                //_UpdateFlow.value = State(Sucess = response)
                 GetNotes()
 
 
@@ -79,8 +82,14 @@ class CommonViewModel : ViewModel() {
         viewModelScope.launch {
             _GetFlow.value = State(isLoading = true)
             try{
-                val response = Client.from("Self_Notron").select()
-                _GetFlow.value = State(Sucess = response as List<Note>)
+                val response1 = Client.from("Self_Notron").select()
+                Logd("response1",response1.toString())
+               val response = response1.decodeList<Note>()
+                //val response = Client.from("Self_Notron").select().decodeAs<Note>()
+                //Logd("response", response.toString())
+
+
+                _GetFlow.value = State(Sucess = response , isLoading = false)
 
             }
             catch (e: Exception) {
@@ -102,9 +111,10 @@ class CommonViewModel : ViewModel() {
 
 
 }
+//@Serializable
 data class State(
     var isLoading: Boolean = false,
-    var Sucess: Any? = null,
+    var Sucess: List<Note>? = null,
     var error: String? = null,
 
     )

@@ -56,7 +56,7 @@ fun AllTaskScreen( veiwModel: CommonViewModel) {
                 veiwModel.AddNote(Note())
             }){
                 Text("Add Task")
-                Icon(painter = painterResource(Res.drawable.plus_svgrepo_com), contentDescription = "Add Task")
+                //Icon(painter = painterResource(Res.drawable.plus_svgrepo_com), contentDescription = "Add Task")
 
             }
         },
@@ -81,8 +81,9 @@ fun AllTaskScreen( veiwModel: CommonViewModel) {
 
         }
         else if(AddNoteState.value.Sucess != null){
+            var success = AddNoteState.value.Sucess!!
             LazyColumn {
-                items(AddNoteState.value.Sucess!! as List<Note>){note->
+                items(success ){ note->
                     TodoCard(viewModel = veiwModel, note = note)
 
                 }

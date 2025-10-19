@@ -15,6 +15,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 
 import androidx.compose.runtime.Composable
@@ -99,9 +100,11 @@ fun TodoCard(viewModel: CommonViewModel, note: Note) {
             }
         }) {
             if (isEditable) {
-                Icon(painter = painterResource(Res.drawable.tick_svgrepo_com), contentDescription = "Edit")
+                Text("Edit")
+               // Icon(painter = painterResource(Res.drawable.tick_svgrepo_com), contentDescription = "Edit")
             } else {
-                Icon(painter = painterResource(Res.drawable.icons8_delete), contentDescription = "Delete")
+                Text("Delete")
+               // Icon(painter = painterResource(Res.drawable.icons8_delete), contentDescription = "Delete")
             }
         }
     }
