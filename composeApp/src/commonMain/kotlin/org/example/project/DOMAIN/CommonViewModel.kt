@@ -36,13 +36,13 @@ class CommonViewModel : ViewModel() {
 
     private val _DeleteFlow = MutableStateFlow(State())
     val DeleteFlow = _DeleteFlow.asStateFlow()
-    fun DeleteNote(id: String) =
+    fun DeleteNote(id: Long?) =
         viewModelScope.launch {
             _DeleteFlow.value = State(isLoading = true)
             try{
                  Client.from("Self_Notron").delete {
                      filter {
-                    eq("id", id)}
+                    eq("id", id!!)}
                 }
                 //_DeleteFlow.value = State(Sucess = "Deleted")
                 GetNotes()
@@ -63,7 +63,7 @@ class CommonViewModel : ViewModel() {
             try{
                 val response = Client.from("Self_Notron").update(note) {
                     filter {
-                    eq("id", note.id.toString())}
+                    eq("id", note.id!!)}
                 }
                 //_UpdateFlow.value = State(Sucess = response)
                 GetNotes()
@@ -82,11 +82,11 @@ class CommonViewModel : ViewModel() {
         viewModelScope.launch {
             _GetFlow.value = State(isLoading = true)
             try{
-                val response1 = Client.from("Self_Notron").select()
-                Logd("response1",response1.toString())
-               val response = response1.decodeList<Note>()
+                var response1 = Client.from("Self_Notron").select()
+                Logd("response1",response1.data.toString())
+               var response = response1.decodeList<Note>()
                 //val response = Client.from("Self_Notron").select().decodeAs<Note>()
-                //Logd("response", response.toString())
+                Logd("response", response.toString())
 
 
                 _GetFlow.value = State(Sucess = response , isLoading = false)

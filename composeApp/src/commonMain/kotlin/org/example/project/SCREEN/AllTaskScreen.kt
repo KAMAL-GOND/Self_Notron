@@ -1,31 +1,26 @@
 package org.example.project.SCREEN
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.example.project.DATA.MODELS.Note
 import org.example.project.DOMAIN.CommonViewModel
@@ -36,73 +31,87 @@ import self_notron.composeapp.generated.resources.plus_svgrepo_com
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllTaskScreen( veiwModel: CommonViewModel) {
-    LaunchedEffect(Unit){
-        veiwModel.GetNotes()
-
+fun AllTaskScreen(viewModel: CommonViewModel) {
+    // Fetch notes once when the screen is first composed
+    LaunchedEffect(Unit) {
+        viewModel.GetNotes()
     }
+
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
-    var AddNoteState= veiwModel.AddStateFlow.collectAsState()
-    var DeleteNoteState = veiwModel.DeleteFlow.collectAsState()
-    var UpdateNoteState = veiwModel.UpdateFlow.collectAsState()
-    var GetNoteState = veiwModel.GetFlow.collectAsState()
+    val getNoteState by viewModel.GetFlow.collectAsState()
+
+    // Listen for errors from all flows and show a snackbar
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.AddStateFlow.collectLatest { state ->
+                if (state.error != null) snackbarHostState.showSnackbar("Error adding note: ${state.error}")
+            }
+        }
+        launch {
+            viewModel.DeleteFlow.collectLatest { state ->
+                if (state.error != null) snackbarHostState.showSnackbar("Error deleting note: ${state.error}")
+            }
+        }
+        launch {
+            viewModel.UpdateFlow.collectLatest { state ->
+                if (state.error != null) snackbarHostState.showSnackbar("Error updating note: ${state.error}")
+            }
+        }
+        launch {
+            viewModel.GetFlow.collectLatest { state ->
+                if (state.error != null) snackbarHostState.showSnackbar("Error fetching notes: ${state.error}")
+            }
+        }
+    }
 
 
     Scaffold(
-        topBar = {Text("All Tasks")},
+        topBar = { TopAppBar(title = { Text("All Tasks") }) },
         floatingActionButton = {
-            FloatingActionButton(modifier = Modifier.background(shape = CircleShape, color = Color.Cyan),onClick = {
-                veiwModel.AddNote(Note())
-            }){
-                Text("Add Task")
+            FloatingActionButton(onClick = {
+                // Create a new note with default non-null values to prevent crashes
+                val newNote = Note(
+                    Task = "New Task",
+                    Checked = false,
+                    Priority = 1
+                )
+                viewModel.AddNote(newNote)
+            }) {
+                Text("add")
                 //Icon(painter = painterResource(Res.drawable.plus_svgrepo_com), contentDescription = "Add Task")
-
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-        //snackbarHost = { Snackbar(snackbarData = TODO()) },
-
-
-
-
-    ) {
-        if(AddNoteState.value.isLoading){ Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){CircularProgressIndicator()}}
-        else if(AddNoteState.value.error != null){
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar(
-                    message = "Error: ${AddNoteState.value.error}"
-                )
-            }
-
-
-
-
-
-        }
-        else if(AddNoteState.value.Sucess != null){
-            var success = AddNoteState.value.Sucess!!
-            LazyColumn {
-                items(success ){ note->
-                    TodoCard(viewModel = veiwModel, note = note)
-
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            when {
+                getNoteState.isLoading -> {
+                    CircularProgressIndicator()
                 }
-                if(DeleteNoteState.value.error != null || UpdateNoteState.value.error != null || GetNoteState.value.error != null){
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = "Error: ${DeleteNoteState.value.error ?: UpdateNoteState.value.error ?: GetNoteState.value.error}"
-                        )
-
+                getNoteState.Sucess != null -> {
+                    val notes = getNoteState.Sucess ?: emptyList()
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(notes) { note ->
+                            TodoCard(viewModel = viewModel, note = note)
+                        }
                     }
                 }
+                // Error state is handled by the LaunchedEffect above,
+                // but you could show a message here too if you wanted.
+                else -> {
+                    // This could be a place for an empty state message
+                     Text("No tasks yet. Add one!")
+                }
             }
         }
-
-
-
     }
-}
-@Composable
-fun TopBar(){
-
 }
