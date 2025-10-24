@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Note (
     var id: Long?= null,
     var Task: String? = null,
-    var Checked: Boolean? = false,
+    var Checked: Boolean? = null,
     var Priority: Int?=null,
     //val created_at: String,
 

@@ -61,6 +61,7 @@ class CommonViewModel : ViewModel() {
         viewModelScope.launch {
             _UpdateFlow.value = State(isLoading = true)
             try{
+                Logd("veiwModel Note", note.toString())
                 val response = Client.from("Self_Notron").update(note) {
                     filter {
                     eq("id", note.id!!)}
@@ -84,9 +85,13 @@ class CommonViewModel : ViewModel() {
             try{
                 var response1 = Client.from("Self_Notron").select()
                 Logd("response1",response1.data.toString())
+                var response3=response1.headers.caseInsensitiveName
+                Logd("response3", response3.toString())
                var response = response1.decodeList<Note>()
                 //val response = Client.from("Self_Notron").select().decodeAs<Note>()
                 Logd("response", response.toString())
+
+
 
 
                 _GetFlow.value = State(Sucess = response , isLoading = false)

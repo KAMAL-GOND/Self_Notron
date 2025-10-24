@@ -14,23 +14,29 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import org.example.project.DATA.MODELS.Note
 import org.example.project.DOMAIN.CommonViewModel
+import org.example.project.SCREEN.Widgets.Logd
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoCard(viewModel: CommonViewModel, note: Note) {
     var isEditable by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(note.Checked ?: false) }
+    var text by remember { mutableStateOf(note.Task ?: "") }
+
+
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp).combinedClickable(
                 onClick = {
-                    isEditable = !isEditable
+                   // isEditable = !isEditable
                 },
                 onLongClick = {
                     isEditable = true
                 },
                 onDoubleClick = {
+                    isEditable = true
 
                 }
 
@@ -44,18 +50,35 @@ fun TodoCard(viewModel: CommonViewModel, note: Note) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            //var a = note.Checked ?: false
             Checkbox(
-                checked = note.Checked ?: false,
-                onCheckedChange = { isChecked ->
-                    viewModel.UpdateNote(note.copy(Checked = isChecked))
+
+                checked = isChecked,
+                onCheckedChange = { it ->
+                    Logd("Checkbox", it.toString())
+//                    if(it==true){
+//
+//                    }
+//                    isChecked = it
+                    Logd("isChecked", isChecked.toString())
+                    //var a = it
+
+                    note.Checked = it
+                    Logd("note.Checked", note.Checked.toString())
+                    viewModel.UpdateNote(note)
+                    isChecked = it
+                    Logd("isChecked 2", isChecked.toString())
+                    //note.Checked = !note.Checked!!
                 }
             )
 
             if (isEditable) {
                 TextField(
-                    value = note.Task ?: "",
+                    value = text,
                     onValueChange = { updatedText ->
-                        viewModel.UpdateNote(note.copy(Task = updatedText))
+                        text = updatedText
+                        note.Task = updatedText.toString()
+                        //viewModel.UpdateNote(note.copy(Task = updatedText))
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -74,6 +97,7 @@ fun TodoCard(viewModel: CommonViewModel, note: Note) {
             IconButton(onClick = {
                 if (isEditable) {
                     isEditable = false
+                    viewModel.UpdateNote(note)
                     // The viewmodel is already updated by onValueChange, so we just exit edit mode
                 } else {
                     viewModel.DeleteNote(note.id)

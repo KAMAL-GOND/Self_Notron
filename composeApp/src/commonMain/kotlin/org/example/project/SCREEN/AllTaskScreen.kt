@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.example.project.DATA.MODELS.Note
 import org.example.project.DOMAIN.CommonViewModel
+import org.example.project.SCREEN.Widgets.Logd
 import org.example.project.screen.widgets.TodoCard
 import org.jetbrains.compose.resources.painterResource
 import self_notron.composeapp.generated.resources.Res
@@ -33,12 +34,20 @@ import self_notron.composeapp.generated.resources.plus_svgrepo_com
 @Composable
 fun AllTaskScreen(viewModel: CommonViewModel) {
     // Fetch notes once when the screen is first composed
+    var TodoList = remember{ mutableListOf<Note>() }
     LaunchedEffect(Unit) {
         viewModel.GetNotes()
     }
 
+
     val snackbarHostState = remember { SnackbarHostState() }
     val getNoteState by viewModel.GetFlow.collectAsState()
+    if (getNoteState.Sucess != null) {
+        TodoList = getNoteState.Sucess as MutableList<Note>
+        Logd("All task Screen 4", TodoList.toString())
+
+    }
+
 
     // Listen for errors from all flows and show a snackbar
     LaunchedEffect(Unit) {
@@ -89,29 +98,31 @@ fun AllTaskScreen(viewModel: CommonViewModel) {
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            when {
-                getNoteState.isLoading -> {
+            if(TodoList.isNullOrEmpty()) {
+                Logd("All task Screen 1", TodoList.toString())
+
+
                     CircularProgressIndicator()
                 }
-                getNoteState.Sucess != null -> {
-                    val notes = getNoteState.Sucess ?: emptyList()
+                else {
+                    Logd("All task Screen 2", TodoList.toString())
+
+                    //val notes = getNoteState.Sucess ?: emptyList()
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(notes) { note ->
-                            TodoCard(viewModel = viewModel, note = note)
+                        items(TodoList!!) { note ->
+                            Logd("All task Screen 3", note.toString())
+
+                            TodoCard(viewModel = viewModel, note = note!!)
                         }
                     }
                 }
-                // Error state is handled by the LaunchedEffect above,
+            // Error state is handled by the LaunchedEffect above,
                 // but you could show a message here too if you wanted.
-                else -> {
-                    // This could be a place for an empty state message
-                     Text("No tasks yet. Add one!")
-                }
+
             }
         }
     }
-}
